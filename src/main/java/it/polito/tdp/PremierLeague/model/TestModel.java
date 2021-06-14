@@ -11,6 +11,8 @@ public class TestModel {
 		
 		model.creaGrafo(m);
 
+		Player migliore = model.getGiocatoreMigliore();
+		System.out.println(migliore);
 	}
 
 }
