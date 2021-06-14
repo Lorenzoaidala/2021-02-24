@@ -6,35 +6,38 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import it.polito.tdp.PremierLeague.model.Action;
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Player;
 import it.polito.tdp.PremierLeague.model.Team;
 
 public class PremierLeagueDAO {
-	
-	public List<Player> listAllPlayers(){
+
+	public void listAllPlayers(Map<Integer,Player> idMap){
 		String sql = "SELECT * FROM Players";
-		List<Player> result = new ArrayList<Player>();
+		//List<Player> result = new ArrayList<Player>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
-
-				Player player = new Player(res.getInt("PlayerID"), res.getString("Name"));
-				result.add(player);
+				if(!idMap.containsKey(res.getInt("PlayerID"))) {
+					Player player = new Player(res.getInt("PlayerID"), res.getString("Name"));
+					idMap.put(res.getInt("PlayerID"), player);
+				}
 			}
 			conn.close();
-			return result;
-			
+
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return null;
+
 		}
 	}
-	
+
 	public List<Team> listAllTeams(){
 		String sql = "SELECT * FROM Teams";
 		List<Team> result = new ArrayList<Team>();
@@ -50,13 +53,13 @@ public class PremierLeagueDAO {
 			}
 			conn.close();
 			return result;
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	public List<Action> listAllActions(){
 		String sql = "SELECT * FROM Actions";
 		List<Action> result = new ArrayList<Action>();
@@ -66,22 +69,22 @@ public class PremierLeagueDAO {
 			PreparedStatement st = conn.prepareStatement(sql);
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
-				
+
 				Action action = new Action(res.getInt("PlayerID"),res.getInt("MatchID"),res.getInt("TeamID"),res.getInt("Starts"),res.getInt("Goals"),
 						res.getInt("TimePlayed"),res.getInt("RedCards"),res.getInt("YellowCards"),res.getInt("TotalSuccessfulPassesAll"),res.getInt("totalUnsuccessfulPassesAll"),
 						res.getInt("Assists"),res.getInt("TotalFoulsConceded"),res.getInt("Offsides"));
-				
+
 				result.add(action);
 			}
 			conn.close();
 			return result;
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	public List<Match> listAllMatches(){
 		String sql = "SELECT m.MatchID, m.TeamHomeID, m.TeamAwayID, m.teamHomeFormation, m.teamAwayFormation, m.resultOfTeamHome, m.date, t1.Name, t2.Name   "
 				+ "FROM Matches m, Teams t1, Teams t2 "
@@ -94,21 +97,47 @@ public class PremierLeagueDAO {
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 
-				
+
 				Match match = new Match(res.getInt("m.MatchID"), res.getInt("m.TeamHomeID"), res.getInt("m.TeamAwayID"), res.getInt("m.teamHomeFormation"), 
-							res.getInt("m.teamAwayFormation"),res.getInt("m.resultOfTeamHome"), res.getTimestamp("m.date").toLocalDateTime(), res.getString("t1.Name"),res.getString("t2.Name"));
-				
-				
+						res.getInt("m.teamAwayFormation"),res.getInt("m.resultOfTeamHome"), res.getTimestamp("m.date").toLocalDateTime(), res.getString("t1.Name"),res.getString("t2.Name"));
+
+
 				result.add(match);
 
 			}
 			conn.close();
 			return result;
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
+	public List<Player> getGiocatoriPerMatch(Map<Integer,Player> idMap, Match m){
+		String sql ="SELECT DISTINCT (PlayerID) "
+				+ "FROM actions "
+				+ "WHERE MatchID = ?";
+		
+		List<Player> result = new ArrayList<Player>();
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, m.getMatchID());
+			ResultSet res = st.executeQuery();
+			
+			while(res.next()) {
+				Player p = idMap.get(res.getInt("PlayerID"));
+				result.add(p);
+			}
+			
+			return result;
+			
+		} catch(SQLException e ) {
+			throw new RuntimeException("Error Connection Database");
+			
+		}
+	}
+
 }
