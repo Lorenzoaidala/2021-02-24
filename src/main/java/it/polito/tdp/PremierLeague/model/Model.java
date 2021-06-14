@@ -30,15 +30,15 @@ public class Model {
 		Graphs.addAllVertices(this.grafo, dao.getGiocatoriPerMatch(idMap, match));
 		
 		for(Adiacenza a : dao.getAdiacenze(idMap, match)) {	
-				Player p1 = a.getPlayer_1();
-				Player p2 = a.getPlayer_2();
-				Double peso = a.getPeso();
-				if(peso>0) {
-					Graphs.addEdgeWithVertices(this.grafo, p1, p2, peso);
-				} else if(peso<0){
-					peso = peso -2*peso;
-					Graphs.addEdgeWithVertices(this.grafo, p2, p1, peso);
+			if(a.getPeso()>=0) {
+				if(this.grafo.containsVertex(a.getPlayer_1())&& this.grafo.containsVertex(a.getPlayer_2())) {
+					Graphs.addEdge(this.grafo, a.getPlayer_1(), a.getPlayer_2(), a.getPeso());
 				}
+			} else {
+				if(this.grafo.containsVertex(a.getPlayer_1())&& this.grafo.containsVertex(a.getPlayer_2())) {
+					Graphs.addEdge(this.grafo, a.getPlayer_2(), a.getPlayer_1(), (-1)*a.getPeso());
+				}
+			}
 		}
 		
 		System.out.println(this.grafo.edgeSet());

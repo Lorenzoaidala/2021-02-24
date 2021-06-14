@@ -157,11 +157,12 @@ public class PremierLeagueDAO {
 			ResultSet res = st.executeQuery();
 			
 			while(res.next()) {
+				if(idMap.containsKey(res.getInt("player_1")) && idMap.containsKey(res.getInt("player_2"))) {
 				Adiacenza a = new Adiacenza(idMap.get(res.getInt("player_1")),
 						idMap.get(res.getInt("player_2")),
 						res.getDouble("efficienza"));
 				result.add(a);
-					 
+				}
 				 }
 			conn.close();
 			return result;
