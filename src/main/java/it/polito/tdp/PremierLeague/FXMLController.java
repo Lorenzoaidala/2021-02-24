@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Model;
+import it.polito.tdp.PremierLeague.model.Player;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -65,8 +66,8 @@ public class FXMLController {
     		txtResult.appendText("Errore - Giocatore non trovato. Presunto errore nella creazione del grafo");
     		return;
     	}
-    	txtResult.appendText("Il giocatore migliore per il match selezionato è stato "+model.getGiocatoreMigliore().toString()+" con "
-    			+ "efficienza "+model.getGiocatoreMigliore().getEfficienza());
+    	Player p = model.getGiocatoreMigliore();
+    	txtResult.appendText(String.format("Il giocatore migliore del match selezonato è stato %s con efficienza di %2f.", p.toString(),p.getEfficienza()));
     }
     
     @FXML

@@ -47,24 +47,25 @@ public class Model {
 
 	}
 	public Player getGiocatoreMigliore() {
-		double efficienza = 0;
+		double efficienza = (double)Integer.MIN_VALUE;
 		Player result = null;
 		if(this.grafo!=null) {
 			for(Player p : this.grafo.vertexSet()) {
 				double temp_out = 0;
 				double temp_in = 0;
-				double risultato_temp=0;
+
 				for(DefaultWeightedEdge e:this.grafo.outgoingEdgesOf(p)) {
-					temp_out=+this.grafo.getEdgeWeight(e);
+					temp_out+=this.grafo.getEdgeWeight(e);
 				}
 				for(DefaultWeightedEdge e:this.grafo.incomingEdgesOf(p)) {
 					temp_in+=this.grafo.getEdgeWeight(e);
 				}
-				risultato_temp = temp_out-temp_in;
-				p.setEfficienza(risultato_temp);
+				double risultato_temp = temp_out-temp_in;
+				//p.setEfficienza(risultato_temp);
 				if(risultato_temp>efficienza) {
 					efficienza=risultato_temp;
 					result = p;
+					result.setEfficienza(efficienza);
 				}
 			}
 		}
