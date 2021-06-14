@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import it.polito.tdp.PremierLeague.model.Action;
+import it.polito.tdp.PremierLeague.model.Adiacenza;
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Player;
 import it.polito.tdp.PremierLeague.model.Team;
@@ -131,13 +132,44 @@ public class PremierLeagueDAO {
 				Player p = idMap.get(res.getInt("PlayerID"));
 				result.add(p);
 			}
-			
+			conn.close();
 			return result;
 			
 		} catch(SQLException e ) {
 			throw new RuntimeException("Error Connection Database");
 			
 		}
+	}
+	
+	public List<Adiacenza> getAdiacenze(Map<Integer,Player> idMap,Match m){
+		String sql ="SELECT a1.PlayerID AS player_1,a2.PlayerID AS player_2,( (a1.TotalSuccessfulPassesAll+a1.Assists)/a1.TimePlayed)- "
+				+ "( (a2.TotalSuccessfulPassesAll+a2.Assists)/a2.TimePlayed) AS efficienza "
+				+ "FROM actions a1,actions a2 "
+				+ "WHERE a1.MatchID=a2.MatchID AND a1.MatchID=? "
+				+ "AND a1.PlayerID>a2.PlayerID AND a1.TeamID<>a2.TeamID";
+		
+		List<Adiacenza> result = new ArrayList<>();
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, m.getMatchID());
+			ResultSet res = st.executeQuery();
+			
+			while(res.next()) {
+				Adiacenza a = new Adiacenza(idMap.get(res.getInt("player_1")),
+						idMap.get(res.getInt("player_2")),
+						res.getDouble("efficienza"));
+				result.add(a);
+					 
+				 }
+			conn.close();
+			return result;
+				
+			}catch(SQLException e) {
+			throw new RuntimeException("Error Connection Database");
+		}
+				
 	}
 
 }

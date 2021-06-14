@@ -29,6 +29,18 @@ public class Model {
 		grafo = new SimpleDirectedGraph<>(DefaultWeightedEdge.class);
 		Graphs.addAllVertices(this.grafo, dao.getGiocatoriPerMatch(idMap, match));
 		
+		for(Adiacenza a : dao.getAdiacenze(idMap, match)) {	
+				Player p1 = a.getPlayer_1();
+				Player p2 = a.getPlayer_2();
+				Double peso = a.getPeso();
+				if(peso>0) {
+					Graphs.addEdgeWithVertices(this.grafo, p1, p2, peso);
+				} else if(peso<0){
+					peso = peso -2*peso;
+					Graphs.addEdgeWithVertices(this.grafo, p2, p1, peso);
+				}
+		}
 		
+		System.out.println(this.grafo.edgeSet());
 	}
 }
